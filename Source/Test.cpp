@@ -79,6 +79,7 @@ namespace ZaPe
                 EXPECT_THROW(iter--, std::out_of_range);
             } END
 
+#ifdef RENDEZ
             TEST (Lista, FeltoltesBele){
                 numbers.clear();
 
@@ -130,11 +131,76 @@ namespace ZaPe
             } END
 
             /// NOTE: <int> test vége 
+#endif
         }
 
-        TEST (Lista, Complex){
 
-
+        TEST (Lista, OnClass_Init){
+            EXPECT_NO_THROW(List<TestClass> tcs);
+            EXPECT_NO_THROW(List<TestClass>::Iterator iter);
         } END
+
+        List<TestClass> tcs;
+        TEST(Lista, OnClass_push_and_accesors){
+
+            EXPECT_NO_THROW(tcs.push_back(TestClass(1, false)));
+            EXPECT_NO_THROW(tcs.push_front(TestClass()));
+            EXPECT_NO_THROW(tcs.push_at(TestClass(2), 1));
+
+            EXPECT_EQ(0, tcs[0].get_number());
+            EXPECT_EQ(true, tcs[0].get_boolean());
+
+            EXPECT_EQ(2, tcs[1].get_number());
+            EXPECT_EQ(true, tcs[1].get_boolean());
+            
+            EXPECT_EQ(1, tcs[2].get_number());
+            EXPECT_EQ(false, tcs[2].get_boolean());
+            
+            EXPECT_NO_THROW(tcs[0].set_number(10));
+            EXPECT_NO_THROW(tcs[0].set_boolean(false));
+
+            EXPECT_EQ(10, tcs[0].get_number());
+            EXPECT_EQ(false, tcs[0].get_boolean());
+        } END
+
+        List<TestClass>::Iterator tcIter;
+        TEST (Lista, OnClass_Iter){
+            EXPECT_NO_THROW(tcIter = tcs.begin());
+
+            TestClass tc;
+            EXPECT_NO_THROW(tc = *tcIter);
+            EXPECT_EQ(10, tc.get_number());
+            EXPECT_EQ(false, tc.get_boolean());
+
+            EXPECT_THROW(*--tcIter, std::out_of_range);
+            tcIter = tcs.begin();
+
+            EXPECT_NO_THROW(tc = *tcIter++);
+            EXPECT_EQ(10, tc.get_number());
+            EXPECT_EQ(false, tc.get_boolean());
+
+            EXPECT_EQ(2, tcIter->get_number());
+            EXPECT_EQ(true, tcIter->get_boolean());
+
+            EXPECT_NO_THROW(tcIter++);
+            EXPECT_NO_THROW(tcIter++);
+            EXPECT_THROW(tcIter++, std::out_of_range);
+        }END
+
+#ifdef RENDEZ
+
+    #ifdef OPERATORS_DEFINED
+
+    #endif
+    #ifndef OPERATORS_DEFINED
+    
+    #endif
+#endif
+
+        TEST(Lista, Clear){
+            EXPECT_NO_THROW(tcs.clear());
+            EXPECT_THROW(tcs[0], std::out_of_range);
+            EXPECT_EQ(0, tcs.get_length());
+        }END
     }
 } 

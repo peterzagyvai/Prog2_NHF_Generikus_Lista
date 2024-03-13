@@ -10,8 +10,9 @@ namespace ZaPe
 {
     /// @brief Generikus lista, adatok rendezett tárolására
     /// @attention CSAK OLYAN ADATOKAT KÉPES TÁROLNI, AMIKRE MEGVANNAK VALÓSÍTVA A KÖVETKEZŐ OPERÁTOROK: 
-    /// @attention operator==()
-    /// @attention operator<()
+    /// @attention operator==(const T&)
+    /// @attention operator<(const T&)
+    /// @attention operator=(const T&)
     /// @attention ezalól kivétel a char* típusú stringek
     template<typename T>
     class List
@@ -307,6 +308,7 @@ namespace ZaPe
     template<typename T>
     T& List<T>::at(int index)
     {
+        if(first == NULL || length == 0) throw std::out_of_range("list has no members yet");
         if(index < 0 || index >= length) throw std::out_of_range("index can not be less than 0 or greater or equal to the current length");
 
         ListElement* iter = first;
@@ -321,6 +323,7 @@ namespace ZaPe
     template<typename T>
     T& List<T>::at(int index) const
     {
+        if(first == NULL || length == 0) throw std::out_of_range("list has no members yet");
         if(index < 0 || index >= length) throw std::out_of_range("index can not be less than 0 or greater or equal to the current length");
 
         ListElement* iter = first;
