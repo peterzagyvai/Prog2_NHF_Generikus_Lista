@@ -1,5 +1,3 @@
-#define TEST_CASES
-
 
 namespace ZaPe
 {

@@ -11,7 +11,6 @@
 namespace ZaPe
 {
 
-    #ifdef TEST_CASES
     void Tests()
     {
         GTINIT(std::cin);
@@ -79,8 +78,63 @@ namespace ZaPe
                 EXPECT_THROW(*--iter, std::out_of_range);
                 EXPECT_THROW(iter--, std::out_of_range);
             } END
-        }
-    }
 
-    #endif // TEST_CASES
+            TEST (Lista, FeltoltesBele){
+                numbers.clear();
+
+                EXPECT_THROW(numbers.push_at(10, -1), std::out_of_range);
+                EXPECT_THROW(numbers.push_at(10,  1), std::out_of_range);
+
+                EXPECT_NO_THROW(numbers.push_at(10, 0));
+                EXPECT_NO_THROW(numbers.push_at(12, 1));
+                EXPECT_NO_THROW(numbers.push_at(11, 1));
+
+                EXPECT_EQ(3, numbers.get_length());
+                EXPECT_EQ(10, numbers[0]);
+                EXPECT_EQ(11, numbers[1]);
+                EXPECT_EQ(12, numbers[2]);
+            } END
+
+            TEST (Lista, Rendez){
+                numbers.clear();
+
+                EXPECT_NO_THROW(numbers.push_back(12));
+                EXPECT_NO_THROW(numbers.push_back(11));
+                EXPECT_NO_THROW(numbers.push_back(15));
+                EXPECT_NO_THROW(numbers.push_back(12));
+                EXPECT_NO_THROW(numbers.push_back( 9));
+
+                EXPECT_NO_THROW(numbers.sort());
+
+                EXPECT_EQ( 5, numbers.get_length());
+
+                EXPECT_EQ( 9, numbers[0]);
+                EXPECT_EQ(11, numbers[1]);
+                EXPECT_EQ(12, numbers[2]);
+                EXPECT_EQ(12, numbers[3]);
+                EXPECT_EQ(15, numbers[4]);
+
+            } END
+
+            TEST (Lista, Duplikacio){
+                EXPECT_NO_THROW(numbers.delete_duplicates());
+
+                EXPECT_EQ( 4, numbers.get_length());
+
+                EXPECT_EQ( 9, numbers[0]);
+                EXPECT_EQ(11, numbers[1]);
+                EXPECT_EQ(12, numbers[2]);
+                EXPECT_EQ(15, numbers[3]);
+
+                EXPECT_THROW(numbers[4], std::out_of_range);
+            } END
+
+            /// NOTE: <int> test vége 
+        }
+
+        TEST (Lista, Complex){
+
+
+        } END
+    }
 } 

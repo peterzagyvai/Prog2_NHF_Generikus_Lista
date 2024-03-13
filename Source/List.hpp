@@ -83,7 +83,6 @@ namespace ZaPe
             ListElement* current;            
         };
 
-
     ///NOTE: Public interface of the list:
     public:
 
@@ -106,23 +105,43 @@ namespace ZaPe
         T& at(int idx) const;
 
 
-
-        /// ==============================================================================
-        ///NOTE:    Ha leadható házinak, akkor a push_back és push_front fv.-ek törlésre kerülnek
-        ///         és helyettük egy add() fv.-t fogok megvalósítani, ami sorba rendeze adja
-        ///         hozzá a listához az új elemet
-        /// ==============================================================================
-
         /// @brief A sor végére fűzi a paraméterként kapott adatot
         void push_back(const T& data);
         
         /// @brief Adds a new item to the start of the list;
         void push_front(const T& data);
 
+        /// @brief A tömb egy adott index helyére illeszt be egy ój elemet
+        /// @param idx 0 <= idx, get_length() > idx 
+        /// @throw std::out_of_range kivételt dob, ha idx a tömb tartományán kívülre esik
+        void push_at(const T& newItem, size_t idx);
+
 
         /// @brief Töröl minden elemet a listából
         void clear();
 
+
+        /// @brief Törli a duplikációkat a tömbből
+        /// @param cmp: fv, ami cmp(cosnt T& t1, const T& t2) paraméterkre egy bool ad vissza, az alapján hogy t1 és t2 mikor egyenlő
+        /// @tparam fv., ami bool paraméterrel tér vissza
+        template<typename C>
+        void delete_duplicates(C cmp);
+
+        /// @brief Törli a duplikációkat a tömbből
+        /// @attention Csak azokra az osztályokra hívhatók, amikre értelmezve van a következő operátor overload:
+        /// @attention operator==(const T&, const T&)
+        void delete_duplicates();
+
+        /// @brief Rendezi a tömb elemeit egy cmp funktoron keresztül
+        /// @param cmp: fv, ami cmp(cosnt T& t1, const T& t2) paraméterkre egy bool ad vissza, az alapján hogy t1 és t2 milyen viszonyban van egymással
+        /// @tparam fv., ami bool paraméterrel tér vissza
+        template<typename C>
+        void sort(C cmp);
+
+        /// @brief Rendezi a tömb elemeit növekvő sorrendbe
+        /// @attention Csak azokra az osztályokra hívhatók, amikre értelmezve van a következő operátor overload:
+        /// @attention operator<(const T&, const T&)
+        void sort();
 
         /// @brief Visszaadja a listában tárolt elemek számát;
         inline int get_length() const { return length; }
@@ -141,15 +160,20 @@ namespace ZaPe
         ListElement* last;
 
         int length;
+        int iterAtIdx;
     };
 
     //Definitions:
+    /// CONSTRUCTORS: =====================================================================
+
     template<typename T>
     List<T>::List()
     : first(NULL), last(NULL), length(0) {}
 
     template<typename T>
     List<T>::~List() { clear(); }
+
+    /// PUSH: ============================================================================= 
 
     template<typename T>
     void List<T>::push_back(const T& newItem)
@@ -177,23 +201,58 @@ namespace ZaPe
     template<typename T>
     void List<T>::push_front(const T& newItem)
     {
-        ListElement* newElem = new ListElement(newItem);
 
         if (first == NULL)
         {
-            first = newElem;
-            last = first;
+            push_back(newItem);
+            return;
         }
-        else
-        {
-            newElem->next = first;
-            first->prev = newElem;
 
-            first = newElem;
+        ListElement* newElem = new ListElement(newItem);
+        newElem->next = first;
+        first->prev = newElem;
+
+        first = newElem;
+        length++;
+    }
+
+    template<typename T>
+    void List<T>::push_at(const T& newItem , size_t idx)
+    {
+        if(idx < 0 || idx > length) throw std::out_of_range("index can not be less than 0 or greater than the current length");
+
+
+        if(first == NULL || idx == length)
+        {
+            push_back(newItem);
+            return;
         }
+
+        if(idx == 0)
+        {
+            push_front(newItem);
+            return;
+        }
+
+        ListElement* newElem = new ListElement(newItem);
+        ListElement* prevNewElemIter = first;
+        for (size_t i = 0; i < (idx - 1); i++)
+        {
+            prevNewElemIter = prevNewElemIter->next;
+        }
+        
+        //Új elem beállítása
+        newElem->prev = prevNewElemIter;
+        newElem->next = prevNewElemIter->next;
+
+        //Szomszédok beállítása:
+        prevNewElemIter->next->prev = newElem;
+        prevNewElemIter->next = newElem;
 
         length++;
     }
+
+    /// CLEAR: ============================================================================
 
     template<typename T>
     void List<T>::clear()
@@ -212,11 +271,43 @@ namespace ZaPe
         last = NULL;
         length = 0;
     }
+    /// SORT: =============================================================================
+
+    //TODO:
+
+    template<typename T>
+    template<typename C>
+    void List<T>::delete_duplicates(C cmp)
+    {
+
+    }
+
+    template<typename T>
+    void List<T>::delete_duplicates()
+    {
+
+    }
+
+
+    template<typename T>
+    template<typename C>
+    void List<T>::sort(C cmp)
+    {
+        
+    }
+
+    template<typename T>
+    void List<T>::sort()
+    {
+
+    }
+
+    /// ACCESSORS: ========================================================================
 
     template<typename T>
     T& List<T>::at(int index)
     {
-        if(index < 0 || index >= length) throw std::out_of_range("index can not be less than 0 or greater than the current length");
+        if(index < 0 || index >= length) throw std::out_of_range("index can not be less than 0 or greater or equal to the current length");
 
         ListElement* iter = first;
         for (int i = 0; i < index; i++)
@@ -230,7 +321,7 @@ namespace ZaPe
     template<typename T>
     T& List<T>::at(int index) const
     {
-        if(index < 0 || index >= length) throw std::out_of_range("index can not be less than 0 or greater than the current length");
+        if(index < 0 || index >= length) throw std::out_of_range("index can not be less than 0 or greater or equal to the current length");
 
         ListElement* iter = first;
         for (int i = 0; i < index; i++)
