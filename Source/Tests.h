@@ -2,6 +2,7 @@
 
 
 #define OPERATORS_DEFINED
+#define RENDEZ
 
 
 namespace ZaPe
@@ -28,8 +29,8 @@ namespace ZaPe
 
 
 #ifdef OPERATORS_DEFINED
-        bool operator==(const TestClass& tc);
-        bool operator<(const TestClass& tc);
+        bool operator==(const TestClass& tc) const;
+        bool operator>(const TestClass& tc) const;
 #endif
 
         
@@ -45,8 +46,8 @@ namespace ZaPe
     };
 
 #ifndef OPERATORS_DEFINED
-        bool equal(const TestClass& tc1, const TestClass& tc2); 
-        bool bigger(const TestClass& tc1, const TestClass& tc2);
+        bool TestClassEq(const TestClass& tc1, const TestClass& tc2); 
+        bool TestClassBigger(const TestClass& tc1, const TestClass& tc2);
 #endif
 
     void Tests();

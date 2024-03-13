@@ -2,6 +2,7 @@
 #define LIST_HPP
 
 #include <iostream>
+#include <cstring>
 
 #include "memtrace.h"
 
@@ -11,7 +12,7 @@ namespace ZaPe
     /// @brief Generikus lista, adatok rendezett tárolására
     /// @attention CSAK OLYAN ADATOKAT KÉPES TÁROLNI, AMIKRE MEGVANNAK VALÓSÍTVA A KÖVETKEZŐ OPERÁTOROK: 
     /// @attention operator==(const T&)
-    /// @attention operator<(const T&)
+    /// @attention operator>(const T&)
     /// @attention operator=(const T&)
     /// @attention ezalól kivétel a char* típusú stringek
     template<typename T>
@@ -137,11 +138,11 @@ namespace ZaPe
         /// @param cmp: fv, ami cmp(cosnt T& t1, const T& t2) paraméterkre egy bool ad vissza, az alapján hogy t1 és t2 milyen viszonyban van egymással
         /// @tparam fv., ami bool paraméterrel tér vissza
         template<typename C>
-        void sort(C cmp);
+        void sort(C cmp(T&, T&));
 
         /// @brief Rendezi a tömb elemeit növekvő sorrendbe
         /// @attention Csak azokra az osztályokra hívhatók, amikre értelmezve van a következő operátor overload:
-        /// @attention operator<(const T&, const T&)
+        /// @attention operator>(const T&, const T&)
         void sort();
 
         /// @brief Visszaadja a listában tárolt elemek számát;
@@ -161,7 +162,10 @@ namespace ZaPe
         ListElement* last;
 
         int length;
-        int iterAtIdx;
+
+        static void swap(T& t1, T& t2);
+        static bool defEqual(T& t1, T& t2);
+        static bool defBigger(T& t1, T& t2);
     };
 
     //Definitions:
@@ -274,7 +278,61 @@ namespace ZaPe
     }
     /// SORT: =============================================================================
 
-    //TODO:
+    template<typename T>
+    void List<T>::swap(T& t1, T& t2)
+    {
+        T tmp = t1;
+        t1 = t2;
+        t2 = tmp;
+    }
+
+    template<>
+    void List<char*>::swap(char*& c1, char*& c2)
+    {
+        //Get sizes
+        size_t size_of_c1 = strlen(c1);
+        size_t size_of_c2 = strlen(c2);
+
+        //Copy c1 to tmp
+        char* tmp = new char[size_of_c1 + 1];
+        strlcpy(tmp,c1,size_of_c1 + 1);
+
+        //Copy c2 to c1
+        delete[] c1;
+        c1 = new char[size_of_c2 + 1];
+        strlcpy(c1, c2, size_of_c2 + 1);
+
+        //Ccopy tmp to c2
+        delete[] c2;
+        c2 = new char[size_of_c1 + 1];
+        strlcpy(c2,tmp,size_of_c2 + 1);
+
+        delete[] tmp;
+    }
+
+    template<typename T>
+    bool List<T>::defBigger(T& t1, T& t2)
+    {
+        return t1 > t2;
+    }
+
+    template<>
+    bool List<char*>::defBigger(char*& c1, char*& c2)
+    {
+        return strcmp(c1,c2) > 0;
+    }
+
+    template<typename T>
+    bool List<T>::defEqual(T& t1, T& t2)
+    {
+        return t1 == t2;
+    }
+
+    template<>
+    bool List<char*>::defEqual(char*& c1, char*& c2)
+    {
+        return strcmp(c1,c2) == 0;
+    }
 
     template<typename T>
     template<typename C>
@@ -286,21 +344,34 @@ namespace ZaPe
     template<typename T>
     void List<T>::delete_duplicates()
     {
-
+        
     }
 
 
     template<typename T>
     template<typename C>
-    void List<T>::sort(C cmp)
+    void List<T>::sort(C cmp(T& , T&))
     {
-        
+        for (size_t i = 0; i < length-1; i++)
+        {
+            bool swapped = false;
+            for (size_t j = 0; j < length - i -1; j++)
+            {
+                if(cmp(at(j), at(j+1)))
+                {
+                    swap(at(j), at(j+1));
+                    swapped = true;
+                }                
+            }
+
+            if (!swapped) break;
+        }
     }
 
     template<typename T>
     void List<T>::sort()
     {
-
+        sort(defBigger);
     }
 
     /// ACCESSORS: ========================================================================

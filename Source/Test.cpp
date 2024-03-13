@@ -1,6 +1,7 @@
 #include "Tests.h"
 
 #include <iostream>
+#include <cstring>
 
 #include "List.hpp"
 
@@ -79,7 +80,6 @@ namespace ZaPe
                 EXPECT_THROW(iter--, std::out_of_range);
             } END
 
-#ifdef RENDEZ
             TEST (Lista, FeltoltesBele){
                 numbers.clear();
 
@@ -96,6 +96,7 @@ namespace ZaPe
                 EXPECT_EQ(12, numbers[2]);
             } END
 
+#ifdef RENDEZ
             TEST (Lista, Rendez){
                 numbers.clear();
 
@@ -117,6 +118,37 @@ namespace ZaPe
 
             } END
 
+            TEST (Lista, char_string_rendez) {
+                List<char*> strings;
+
+                char* c1 = "Hello Wolrd";
+                char* c2 = "Szia Uram";
+                char* c3 = "Hello Prog2";
+
+                char* s1 = new char[strlen(c1) + 1];
+                char* s2 = new char[strlen(c2) + 1]; 
+                char* s3 = new char[strlen(c3) + 1]; 
+
+                strlcpy(s1, c1, strlen(c1) + 1);
+                strlcpy(s2, c2, strlen(c2) + 1);
+                strlcpy(s3, c3, strlen(c3) + 1);
+
+                EXPECT_NO_THROW(strings.push_back(s1));
+                EXPECT_NO_THROW(strings.push_back(s2));
+                EXPECT_NO_THROW(strings.push_back(s3));
+
+                EXPECT_NO_THROW(strings.sort());
+
+                EXPECT_STREQ(c3, strings[0]);
+                EXPECT_STREQ(c1, strings[1]);
+                EXPECT_STREQ(c2, strings[2]);
+
+                delete[] s1;
+                delete[] s2;
+                delete[] s3;
+            }END
+#endif
+#ifdef DUPLIK
             TEST (Lista, Duplikacio){
                 EXPECT_NO_THROW(numbers.delete_duplicates());
 
@@ -129,9 +161,8 @@ namespace ZaPe
 
                 EXPECT_THROW(numbers[4], std::out_of_range);
             } END
-
-            /// NOTE: <int> test vége 
 #endif
+            /// NOTE: <int> test vége 
         }
 
 
@@ -190,10 +221,16 @@ namespace ZaPe
 #ifdef RENDEZ
 
     #ifdef OPERATORS_DEFINED
-
+        TEST (Lista, OnClass_Rendez_Operatorok) {
+            EXPECT_NO_THROW(tcs.sort());
+            EXPECT_EQ( 1, tcs[0].get_number());
+            EXPECT_EQ( 2, tcs[1].get_number());
+            EXPECT_EQ(10, tcs[2].get_number());
+        } END
     #endif
     #ifndef OPERATORS_DEFINED
-    
+        TEST (Lista, OnClass_Renez_No_Operators) {
+        } END
     #endif
 #endif
 
@@ -204,3 +241,32 @@ namespace ZaPe
         }END
     }
 } 
+
+#ifdef OPERATORS_DEFINED
+namespace ZaPe
+{
+    bool TestClass::operator>(const TestClass& t1) const
+    {
+        return number > t1.get_number();
+    }
+
+    bool TestClass::operator==(const TestClass& t1) const
+    {
+        return (t1.get_number() == number && t1.get_boolean() == boolean);
+    }
+}
+#endif
+#ifndef OPERATORS_DEFINED
+namespace ZaPe
+{
+    bool TestClassEq(TestClass& t1, TestClass& t2)
+    {
+        return (t1.get_number() == t2.get_number() && t1.get_boolean() == t2.get_boolean());
+    }
+
+    bool TestClassBigger(TestClass& t1, TestClass t2)
+    {
+        return t1.get_number() < t2.get_number();
+    }
+}
+#endif
