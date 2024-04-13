@@ -406,8 +406,6 @@ namespace ZaPe
         return iter->data;
     }
     
-    ///FIXME: Iterator drops last item in list
-
     template<typename T>
     List<T>::Iterator::Iterator() : current(NULL) {}
     
