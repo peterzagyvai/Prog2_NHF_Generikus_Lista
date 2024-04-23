@@ -148,6 +148,7 @@ namespace ZaPe
         /// @throw std::out_of_range kivételt dob, ha idx a tömb tartományán kívülre esik
         void push_at(const T& newItem, size_t idx);
 
+        void delete_at(size_t idx);
 
         /// @brief Töröl minden elemet a listából
         void clear();
@@ -156,14 +157,14 @@ namespace ZaPe
         /// @brief Törli a duplikációkat a tömbből
         /// @param cmp: fv, ami cmp(cosnt T& t1, const T& t2) paraméterkre egy bool ad vissza, az alapján hogy t1 és t2 mikor egyenlő
         /// @tparam fv., ami bool paraméterrel tér vissza
-        template<typename Cmp = Compare::DefaultEqual<T>>
+        template<typename Cmp = Compare::DefaultEqual<T> >
         void delete_duplicates(Cmp cmp = Compare::DefaultEqual<T>());
 
 
         /// @brief Rendezi a tömb elemeit egy cmp funktoron keresztül
         /// @param cmp: fv, ami cmp(cosnt T& t1, const T& t2) paraméterkre egy bool ad vissza, az alapján hogy t1 és t2 milyen viszonyban van egymással
         /// @tparam fv., ami bool paraméterrel tér vissza
-        template<typename Cmp = Compare::DefaultBigger<T>>
+        template<typename Cmp = Compare::DefaultBigger<T> >
         void sort(Cmp cmp = Compare::DefaultBigger<T>());
 
         /// @brief Rendezi a tömb elemeit növekvő sorrendbe
@@ -314,7 +315,6 @@ namespace ZaPe
     template<typename Cmp>
     void List<T>::delete_duplicates(Cmp cmp)
     {
-
     }
 
     template<typename T>
@@ -455,6 +455,7 @@ namespace ZaPe
     {
         return t1 == t2;
     }
+
 }
 
 #endif

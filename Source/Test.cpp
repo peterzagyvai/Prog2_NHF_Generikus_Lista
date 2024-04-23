@@ -124,17 +124,9 @@ namespace ZaPe
                 const char* c2 = "Szia Uram";
                 const char* c3 = "Hello Prog2";
 
-                char* s1 = new char[strlen(c1) + 1];
-                char* s2 = new char[strlen(c2) + 1]; 
-                char* s3 = new char[strlen(c3) + 1]; 
-
-                strncpy(s1, c1, strlen(c1) + 1);
-                strncpy(s2, c2, strlen(c2) + 1);
-                strncpy(s3, c3, strlen(c3) + 1);
-
-                EXPECT_NO_THROW(strings.push_back(s1));
-                EXPECT_NO_THROW(strings.push_back(s2));
-                EXPECT_NO_THROW(strings.push_back(s3));
+                EXPECT_NO_THROW(strings.push_back(c1));
+                EXPECT_NO_THROW(strings.push_back(c2));
+                EXPECT_NO_THROW(strings.push_back(c3));
 
                 EXPECT_NO_THROW(strings.sort());
 
@@ -142,9 +134,6 @@ namespace ZaPe
                 EXPECT_STREQ(c1, strings[1]);
                 EXPECT_STREQ(c2, strings[2]);
 
-                delete[] s1;
-                delete[] s2;
-                delete[] s3;
             }END
 #endif
 #ifdef DUPLIK
