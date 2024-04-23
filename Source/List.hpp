@@ -3,12 +3,42 @@
 
 #include <iostream>
 #include <cstring>
+#include <string>
 
 #include "memtrace.h"
 
-
 namespace ZaPe
 {
+    namespace Compare 
+    {
+        template<typename T>
+        struct DefaultBigger
+        {
+            bool operator()(const T& t1, const T& t2);
+        };
+
+        template<>
+        struct DefaultBigger<const char*>
+        {
+            bool operator()(const char* c1, const char* c2);
+        };
+
+        template<>
+        struct DefaultBigger<char*>
+        {
+            bool operator()(char* c1, char* c2);
+        };
+
+        template<typename T>
+        struct DefaultEqual
+        {
+            bool operator()(const T& t1, const T& t2);
+        };
+
+
+
+    }
+
     /// @brief Generikus lista, adatok rendezett tárolására
     /// @attention CSAK OLYAN ADATOKAT KÉPES TÁROLNI, AMIKRE MEGVANNAK VALÓSÍTVA A KÖVETKEZŐ OPERÁTOROK: 
     /// @attention operator==(const T&)
@@ -26,7 +56,7 @@ namespace ZaPe
             ListElement* next;
             ListElement* prev;
 
-            ListElement(T nData) : data(nData), prev(NULL), next(NULL) {}
+            ListElement(const T& nData) : data(nData), prev(NULL), next(NULL) {}
         };
 
 
@@ -100,11 +130,11 @@ namespace ZaPe
 
         /// @brief Visszaadja az "idx" helyen szereplő tárolt adatot
         /// @throws std:out_of_range kivételt dob, ha "idx" kissebb mint 0, vagy nagyobb/egyenlő mint a listában tárolt elemek száma
-        T& at(int idx);
+        T& at(size_t idx);
 
         /// @brief Visszaadja az "idx" helyen szereplő tárolt adatot
         /// @throws std:out_of_range kivételt dob, ha "idx" kissebb mint 0, vagy nagyobb/egyenlő mint a listában tárolt elemek száma
-        T& at(int idx) const;
+        T& at(size_t idx) const;
 
 
         /// @brief A sor végére fűzi a paraméterként kapott adatot
@@ -126,46 +156,40 @@ namespace ZaPe
         /// @brief Törli a duplikációkat a tömbből
         /// @param cmp: fv, ami cmp(cosnt T& t1, const T& t2) paraméterkre egy bool ad vissza, az alapján hogy t1 és t2 mikor egyenlő
         /// @tparam fv., ami bool paraméterrel tér vissza
-        template<typename C>
-        void delete_duplicates(C cmp);
+        template<typename Cmp = Compare::DefaultEqual<T>>
+        void delete_duplicates(Cmp cmp = Compare::DefaultEqual<T>());
 
-        /// @brief Törli a duplikációkat a tömbből
-        /// @attention Csak azokra az osztályokra hívhatók, amikre értelmezve van a következő operátor overload:
-        /// @attention operator==(const T&, const T&)
-        void delete_duplicates();
 
         /// @brief Rendezi a tömb elemeit egy cmp funktoron keresztül
         /// @param cmp: fv, ami cmp(cosnt T& t1, const T& t2) paraméterkre egy bool ad vissza, az alapján hogy t1 és t2 milyen viszonyban van egymással
         /// @tparam fv., ami bool paraméterrel tér vissza
-        template<typename C>
-        void sort(C cmp(T&, T&));
+        template<typename Cmp = Compare::DefaultBigger<T>>
+        void sort(Cmp cmp = Compare::DefaultBigger<T>());
 
         /// @brief Rendezi a tömb elemeit növekvő sorrendbe
         /// @attention Csak azokra az osztályokra hívhatók, amikre értelmezve van a következő operátor overload:
         /// @attention operator>(const T&, const T&)
-        void sort();
+        //void sort();
 
         /// @brief Visszaadja a listában tárolt elemek számát;
-        inline int get_length() const { return length; }
+        inline size_t get_length() const { return length; }
 
 
         /// @brief Visszaadja az "idx" helyen szereplő tárolt adatot
         /// @throws std:out_of_range kivételt dob, ha "idx" kissebb mint 0, vagy nagyobb/egyenlő mint a listában tárolt elemek száma
-        inline T& operator[](int idx) {return at(idx); } 
+        inline T& operator[](size_t idx) {return at(idx); } 
 
         /// @brief Visszaadja az "idx" helyen szereplő tárolt adatot
         /// @throws std:out_of_range kivételt dob, ha "idx" kissebb mint 0, vagy nagyobb/egyenlő mint a listában tárolt elemek száma
-        inline T& operator[](int idx) const {return at(idx); } 
+        inline T& operator[](size_t idx) const {return at(idx); } 
 
     private:
         ListElement* first;
         ListElement* last;
 
-        int length;
+        size_t length;
 
         static void swap(T& t1, T& t2);
-        static bool defEqual(T& t1, T& t2);
-        static bool defBigger(T& t1, T& t2);
     };
 
     //Definitions:
@@ -286,71 +310,16 @@ namespace ZaPe
         t2 = tmp;
     }
 
-    template<>
-    void List<char*>::swap(char*& c1, char*& c2)
-    {
-        //Get sizes
-        size_t size_of_c1 = strlen(c1);
-        size_t size_of_c2 = strlen(c2);
-
-        //Copy c1 to tmp
-        char* tmp = new char[size_of_c1 + 1];
-        strlcpy(tmp,c1,size_of_c1 + 1);
-
-        //Copy c2 to c1
-        delete[] c1;
-        c1 = new char[size_of_c2 + 1];
-        strlcpy(c1, c2, size_of_c2 + 1);
-
-        //Ccopy tmp to c2
-        delete[] c2;
-        c2 = new char[size_of_c1 + 1];
-        strlcpy(c2,tmp,size_of_c2 + 1);
-
-        delete[] tmp;
-    }
-
     template<typename T>
-    bool List<T>::defBigger(T& t1, T& t2)
-    {
-        return t1 > t2;
-    }
-
-    template<>
-    bool List<char*>::defBigger(char*& c1, char*& c2)
-    {
-        return strcmp(c1,c2) > 0;
-    }
-
-    template<typename T>
-    bool List<T>::defEqual(T& t1, T& t2)
-    {
-        return t1 == t2;
-    }
-
-    template<>
-    bool List<char*>::defEqual(char*& c1, char*& c2)
-    {
-        return strcmp(c1,c2) == 0;
-    }
-
-    template<typename T>
-    template<typename C>
-    void List<T>::delete_duplicates(C cmp)
+    template<typename Cmp>
+    void List<T>::delete_duplicates(Cmp cmp)
     {
 
     }
 
     template<typename T>
-    void List<T>::delete_duplicates()
-    {
-        
-    }
-
-
-    template<typename T>
-    template<typename C>
-    void List<T>::sort(C cmp(T& , T&))
+    template<typename Cmp>
+    void List<T>::sort(Cmp cmp)
     {
         for (size_t i = 0; i < length-1; i++)
         {
@@ -368,16 +337,11 @@ namespace ZaPe
         }
     }
 
-    template<typename T>
-    void List<T>::sort()
-    {
-        sort(defBigger);
-    }
 
     /// ACCESSORS: ========================================================================
 
     template<typename T>
-    T& List<T>::at(int index)
+    T& List<T>::at(size_t index)
     {
         if(first == NULL || length == 0) throw std::out_of_range("list has no members yet");
         if(index < 0 || index >= length) throw std::out_of_range("index can not be less than 0 or greater or equal to the current length");
@@ -392,7 +356,7 @@ namespace ZaPe
     }
 
     template<typename T>
-    T& List<T>::at(int index) const
+    T& List<T>::at(size_t index) const
     {
         if(first == NULL || length == 0) throw std::out_of_range("list has no members yet");
         if(index < 0 || index >= length) throw std::out_of_range("index can not be less than 0 or greater or equal to the current length");
@@ -466,6 +430,30 @@ namespace ZaPe
         if (current != NULL) return &(current->data);
 
         throw std::out_of_range("Iter pointing to NULL");
+    }
+
+    /// COMPARE:
+
+    template<typename T>
+    bool Compare::DefaultBigger<T>::operator()(const T& t1, const T& t2)
+    {
+        return t1 > t2;
+    }
+
+    inline bool Compare::DefaultBigger<const char*>::operator()(const char* c1, const char* c2)
+    {
+        return strcmp(c1, c2) > 0;
+    }
+
+    inline bool Compare::DefaultBigger<char*>::operator()(char* c1, char* c2)
+    {
+        return strcmp(c1, c2) > 0;
+    }
+    
+    template<typename T>
+    bool Compare::DefaultEqual<T>::operator()(const T& t1, const T& t2)
+    {
+        return t1 == t2;
     }
 }
 

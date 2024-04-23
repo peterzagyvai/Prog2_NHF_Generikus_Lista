@@ -8,7 +8,6 @@
 #include "gtest_lite.h"
 #include "memtrace.h"
 
-
 namespace ZaPe
 {
 
@@ -119,19 +118,19 @@ namespace ZaPe
             } END
 
             TEST (Lista, char_string_rendez) {
-                List<char*> strings;
+                List<const char*> strings;
 
-                char* c1 = "Hello Wolrd";
-                char* c2 = "Szia Uram";
-                char* c3 = "Hello Prog2";
+                const char* c1 = "Hello Wolrd";
+                const char* c2 = "Szia Uram";
+                const char* c3 = "Hello Prog2";
 
                 char* s1 = new char[strlen(c1) + 1];
                 char* s2 = new char[strlen(c2) + 1]; 
                 char* s3 = new char[strlen(c3) + 1]; 
 
-                strlcpy(s1, c1, strlen(c1) + 1);
-                strlcpy(s2, c2, strlen(c2) + 1);
-                strlcpy(s3, c3, strlen(c3) + 1);
+                strncpy(s1, c1, strlen(c1) + 1);
+                strncpy(s2, c2, strlen(c2) + 1);
+                strncpy(s3, c3, strlen(c3) + 1);
 
                 EXPECT_NO_THROW(strings.push_back(s1));
                 EXPECT_NO_THROW(strings.push_back(s2));

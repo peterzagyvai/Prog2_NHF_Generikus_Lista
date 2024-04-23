@@ -4,6 +4,9 @@
 #define OPERATORS_DEFINED
 #define RENDEZ
 
+#ifndef TEST_H
+#define TEST_H
+
 
 namespace ZaPe
 {
@@ -52,3 +55,6 @@ namespace ZaPe
 
     void Tests();
 }
+
+#endif // !TEST_H
+
