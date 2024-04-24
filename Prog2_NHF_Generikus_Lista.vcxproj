@@ -153,6 +153,9 @@
     <ClCompile Include="Source\memtrace.cpp" />
     <ClCompile Include="Source\Test.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Bin\Input_Output\test.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

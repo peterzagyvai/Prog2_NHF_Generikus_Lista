@@ -117,6 +117,32 @@ namespace ZaPe
 
             } END
 
+            TEST(Lista, Keres) {
+
+                size_t idx;
+                EXPECT_NO_THROW(idx = numbers.find_first(9));
+                EXPECT_EQ(0, idx);
+
+                EXPECT_NO_THROW(idx = numbers.find_first(11));
+                EXPECT_EQ(1, idx);
+
+                EXPECT_THROW(numbers.find_first(5), std::out_of_range);
+
+
+            } END
+
+            TEST(Lista, Torol) {
+                List<int> szamok;
+                szamok.push_back(1);
+
+                EXPECT_NO_THROW(szamok.delete_at(0));
+                EXPECT_THROW(szamok[0], std::out_of_range);
+                EXPECT_EQ(0, szamok.get_length());
+
+                EXPECT_NO_THROW(numbers.delete_at(0));
+                EXPECT_EQ(11, numbers[0]);
+            } END
+
             TEST (Lista, char_string_rendez) {
                 List<const char*> strings;
 
@@ -135,19 +161,25 @@ namespace ZaPe
                 EXPECT_STREQ(c2, strings[2]);
 
             }END
+
+
 #endif
 #ifdef DUPLIK
             TEST (Lista, Duplikacio){
-                EXPECT_NO_THROW(numbers.delete_duplicates());
+                List<int> szamok;
 
-                EXPECT_EQ( 4, numbers.get_length());
+                szamok.push_back(1);
+                szamok.push_back(2);
+                szamok.push_back(2);
+                szamok.push_back(1);
+                szamok.push_back(3);
 
-                EXPECT_EQ( 9, numbers[0]);
-                EXPECT_EQ(11, numbers[1]);
-                EXPECT_EQ(12, numbers[2]);
-                EXPECT_EQ(15, numbers[3]);
+                EXPECT_NO_THROW(szamok.delete_duplicates());
 
-                EXPECT_THROW(numbers[4], std::out_of_range);
+                EXPECT_EQ(3, szamok.get_length());
+                EXPECT_EQ(1, szamok[0]);
+                EXPECT_EQ(2, szamok[1]);
+                EXPECT_EQ(3, szamok[2]);
             } END
 #endif
             /// NOTE: <int> test vége 
@@ -206,6 +238,8 @@ namespace ZaPe
             EXPECT_THROW(tcIter++, std::out_of_range);
         }END
 
+
+
 #ifdef RENDEZ
 
     #ifdef OPERATORS_DEFINED
@@ -218,6 +252,16 @@ namespace ZaPe
     #endif
     #ifndef OPERATORS_DEFINED
         TEST (Lista, OnClass_Renez_No_Operators) {
+            List<TestClass> tcs2;
+            tcs2.push_back(TestClass(3));
+            tcs2.push_back(TestClass(1));
+            tcs2.push_back(TestClass(2));
+
+            EXPECT_NO_THROW(tcs2.sort(Compare::TestSortFunctor()));
+
+            EXPECT_EQ(3, tcs2[0].get_number());
+            EXPECT_EQ(2, tcs2[1].get_number());
+            EXPECT_EQ(1, tcs2[2].get_number());
         } END
     #endif
 #endif
@@ -229,6 +273,48 @@ namespace ZaPe
         }END
     }
 } 
+
+
+
+void ZaPe::TestClass::write(const char* filePath) const
+{
+    /*
+        amountOfData
+        TC1
+        TC2
+        ...
+        TCn
+    */
+
+    std::ifstream inputFile(filePath);
+    size_t amountOfDataInFile;
+
+    // If the file does not exist or is empty, just write the new line
+    if (!inputFile || inputFile.peek() == std::ifstream::traits_type::eof()) {
+        amountOfDataInFile = 0;
+
+        std::ofstream outputFile(filePath);
+        outputFile << 1 << std::endl;
+    }
+    else
+    {
+        amountOfDataInFile = 
+    }
+
+    // Read the content of the file line by line into a vector
+    std::vector<std::string> lines;
+    std::string line;
+    while (std::getline(inputFile, line)) {
+        lines.push_back(line);
+    }
+
+    // Close the input file
+    inputFile.close();
+
+
+    // Append
+}
+
 
 #ifdef OPERATORS_DEFINED
 namespace ZaPe
@@ -247,14 +333,14 @@ namespace ZaPe
 #ifndef OPERATORS_DEFINED
 namespace ZaPe
 {
-    bool TestClassEq(TestClass& t1, TestClass& t2)
+    bool Compare::TestSortFunctor::operator()(const TestClass& tc1, const TestClass& tc2)
     {
-        return (t1.get_number() == t2.get_number() && t1.get_boolean() == t2.get_boolean());
+        return tc1.get_number() < tc2.get_number();
     }
 
-    bool TestClassBigger(TestClass& t1, TestClass t2)
+    bool Compare::TestEqualFunctor::operator()(const TestClass& tc1, const TestClass& tc2)
     {
-        return t1.get_number() < t2.get_number();
+        return (tc1.get_number() == tc2.get_number() && tc1.get_boolean() == tc2.get_boolean());
     }
 }
 #endif

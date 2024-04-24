@@ -52,11 +52,15 @@ namespace ZaPe
     private:
         struct ListElement
         {
+            ListElement(const T& nData) : data(nData)
+            {
+                prev = NULL;
+                next = NULL;
+            }
+            
             T data;
             ListElement* next;
             ListElement* prev;
-
-            ListElement(const T& nData) : data(nData), prev(NULL), next(NULL) {}
         };
 
 
@@ -119,10 +123,13 @@ namespace ZaPe
     public:
 
         /// @brief Default konstruktor, létrehoz egy üres listát
-        List();
+        List() : first(NULL), last(NULL), length(0) {}
 
         /// @brief Másoló konstruktor, lemásolja a paraméterként kapott listát
         List(const List& list);
+
+        /// @brief Létrehoz egy listát a paraméerben megadott tömb és méret alapján
+        List(T* dataArray, size_t sizeOfArray);
 
         /// @brief Felszabadítja a lista elemeit
         ~List();
@@ -134,7 +141,7 @@ namespace ZaPe
 
         /// @brief Visszaadja az "idx" helyen szereplő tárolt adatot
         /// @throws std:out_of_range kivételt dob, ha "idx" kissebb mint 0, vagy nagyobb/egyenlő mint a listában tárolt elemek száma
-        T& at(size_t idx) const;
+        const T& at(size_t idx) const;
 
 
         /// @brief A sor végére fűzi a paraméterként kapott adatot
@@ -160,17 +167,11 @@ namespace ZaPe
         template<typename Cmp = Compare::DefaultEqual<T> >
         void delete_duplicates(Cmp cmp = Compare::DefaultEqual<T>());
 
-
         /// @brief Rendezi a tömb elemeit egy cmp funktoron keresztül
         /// @param cmp: fv, ami cmp(cosnt T& t1, const T& t2) paraméterkre egy bool ad vissza, az alapján hogy t1 és t2 milyen viszonyban van egymással
         /// @tparam fv., ami bool paraméterrel tér vissza
         template<typename Cmp = Compare::DefaultBigger<T> >
         void sort(Cmp cmp = Compare::DefaultBigger<T>());
-
-        /// @brief Rendezi a tömb elemeit növekvő sorrendbe
-        /// @attention Csak azokra az osztályokra hívhatók, amikre értelmezve van a következő operátor overload:
-        /// @attention operator>(const T&, const T&)
-        //void sort();
 
         /// @brief Visszaadja a listában tárolt elemek számát;
         inline size_t get_length() const { return length; }
@@ -182,7 +183,7 @@ namespace ZaPe
 
         /// @brief Visszaadja az "idx" helyen szereplő tárolt adatot
         /// @throws std:out_of_range kivételt dob, ha "idx" kissebb mint 0, vagy nagyobb/egyenlő mint a listában tárolt elemek száma
-        inline T& operator[](size_t idx) const {return at(idx); } 
+        inline const T& operator[](size_t idx) const {return at(idx); } 
 
     private:
         ListElement* first;
@@ -194,11 +195,6 @@ namespace ZaPe
     };
 
     //Definitions:
-    /// CONSTRUCTORS: =====================================================================
-
-    template<typename T>
-    List<T>::List()
-    : first(NULL), last(NULL), length(0) {}
 
     template<typename T>
     List<T>::~List() { clear(); }
@@ -249,7 +245,8 @@ namespace ZaPe
     template<typename T>
     void List<T>::push_at(const T& newItem , size_t idx)
     {
-        if(idx < 0 || idx > length) throw std::out_of_range("index can not be less than 0 or greater than the current length");
+        if(idx < 0 || idx > length)
+            throw std::out_of_range("index can not be less than 0 or greater than the current length");
 
 
         if(first == NULL || idx == length)
@@ -315,6 +312,32 @@ namespace ZaPe
     template<typename Cmp>
     void List<T>::delete_duplicates(Cmp cmp)
     {
+        if (length <= 1) return; // Nem  lehet benne duplikáció
+
+        ListElement* outer_iter = first;
+        size_t outIndex = 0;
+
+        while (outer_iter != NULL)
+        {
+            size_t deleteIdex = outIndex + 1;
+            ListElement* inner_iter = outer_iter->next;
+
+            while (inner_iter != NULL)
+            {
+                ListElement* tmp = inner_iter;
+                inner_iter = inner_iter->next;
+
+                if (cmp(tmp->data, outer_iter->data))
+                {
+                    delete_at(deleteIdex);
+                }
+
+                deleteIdex++;
+            }
+
+            outIndex++;
+            outer_iter = outer_iter->next;
+        }
     }
 
     template<typename T>
@@ -338,16 +361,50 @@ namespace ZaPe
     }
 
 
+    template<typename T>
+    void List<T>::delete_at(size_t idx)
+    {
+        if (idx < 0 || idx >= length) throw std::out_of_range("DELETE_AT, index out of range");
+
+        ListElement* iter = first;
+
+        for (size_t i = 0; i < idx; i++)
+        {
+            if (iter == NULL) throw std::out_of_range("DELETE_AT, trying to iter a NULL");
+
+            iter = iter->next;
+        }
+
+        if (iter == NULL) throw std::out_of_range("DELETE_AT, trying to delete a NULL Element");
+
+        if (iter->prev != NULL) iter->prev->next = iter->next;
+        else first = iter->next;
+
+        if (iter->next != NULL) iter->next->prev = iter->prev;
+        else last = iter->prev;
+
+        delete iter;
+
+        length--;
+
+        if (length == 0)
+        {
+            first = last = NULL;
+        }
+    }
+
     /// ACCESSORS: ========================================================================
 
     template<typename T>
     T& List<T>::at(size_t index)
     {
-        if(first == NULL || length == 0) throw std::out_of_range("list has no members yet");
-        if(index < 0 || index >= length) throw std::out_of_range("index can not be less than 0 or greater or equal to the current length");
+        if(first == NULL || length == 0)
+            throw std::out_of_range("list has no members yet");
+        if(index < 0 || index >= length)
+            throw std::out_of_range("index can not be less than 0 or greater or equal to the current length");
 
         ListElement* iter = first;
-        for (int i = 0; i < index; i++)
+        for (size_t i = 0; i < index; i++)
         {
             iter = iter->next;
         }
@@ -356,7 +413,7 @@ namespace ZaPe
     }
 
     template<typename T>
-    T& List<T>::at(size_t index) const
+    const T& List<T>::at(size_t index) const
     {
         if(first == NULL || length == 0) throw std::out_of_range("list has no members yet");
         if(index < 0 || index >= length) throw std::out_of_range("index can not be less than 0 or greater or equal to the current length");
@@ -445,16 +502,17 @@ namespace ZaPe
         return strcmp(c1, c2) > 0;
     }
 
-    inline bool Compare::DefaultBigger<char*>::operator()(char* c1, char* c2)
-    {
-        return strcmp(c1, c2) > 0;
-    }
-    
     template<typename T>
     bool Compare::DefaultEqual<T>::operator()(const T& t1, const T& t2)
     {
         return t1 == t2;
     }
+
+    inline bool Compare::DefaultBigger<char*>::operator()(char* c1, char* c2)
+    {
+        return strcmp(c1, c2) > 0;
+    }
+    
 
 }
 

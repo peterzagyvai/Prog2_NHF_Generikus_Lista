@@ -1,8 +1,9 @@
 #include "memtrace.h"
 
 
-#define OPERATORS_DEFINED
+//#define OPERATORS_DEFINED
 #define RENDEZ
+#define DUPLIK
 
 #ifndef TEST_H
 #define TEST_H
@@ -43,15 +44,28 @@ namespace ZaPe
         inline void set_number(int number) { this->number = number; }
         inline void set_boolean(bool boolean) { this->boolean = boolean; }
 
+        void write(const char* filePath) const;
+        static size_t read(const char* filePath, TestClass* tcArray);
+
     private:
         int number;
         bool boolean;
     };
 
-#ifndef OPERATORS_DEFINED
-        bool TestClassEq(const TestClass& tc1, const TestClass& tc2); 
-        bool TestClassBigger(const TestClass& tc1, const TestClass& tc2);
-#endif
+    namespace Compare
+    {
+        class TestSortFunctor
+        {
+        public:
+            bool operator()(const TestClass& tc1, const TestClass& tc2);
+        };
+
+        class TestEqualFunctor
+        {
+        public:
+            bool operator()(const TestClass& tc1, const TestClass& tc2);
+        };
+    }
 
     void Tests();
 }
