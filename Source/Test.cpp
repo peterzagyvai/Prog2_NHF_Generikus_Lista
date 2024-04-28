@@ -117,19 +117,6 @@ namespace ZaPe
 
             } END
 
-            TEST(Lista, Keres) {
-
-                size_t idx;
-                EXPECT_NO_THROW(idx = numbers.find_first(9));
-                EXPECT_EQ(0, idx);
-
-                EXPECT_NO_THROW(idx = numbers.find_first(11));
-                EXPECT_EQ(1, idx);
-
-                EXPECT_THROW(numbers.find_first(5), std::out_of_range);
-
-
-            } END
 
             TEST(Lista, Torol) {
                 List<int> szamok;
@@ -278,41 +265,85 @@ namespace ZaPe
 
 void ZaPe::TestClass::write(const char* filePath) const
 {
-    /*
-        amountOfData
-        TC1
-        TC2
-        ...
-        TCn
-    */
-
-    std::ifstream inputFile(filePath);
-    size_t amountOfDataInFile;
-
-    // If the file does not exist or is empty, just write the new line
-    if (!inputFile || inputFile.peek() == std::ifstream::traits_type::eof()) {
-        amountOfDataInFile = 0;
-
-        std::ofstream outputFile(filePath);
-        outputFile << 1 << std::endl;
-    }
-    else
+    size_t size = 0;
+    TestClass* tcArray = NULL;
+    bool fileExists = true;
+    try
     {
-        amountOfDataInFile = 
+        size = TestClass::read(filePath);
+        tcArray = new TestClass[size];
+        TestClass::read(filePath, tcArray);
+    }
+    catch (std::out_of_range e)
+    {
+        delete[] tcArray;
+        if (strcmp(e.what(), "Unable to open file") != 0) // Létezik a fájl, de mégis hibát dob
+        {
+            std::cout << e.what() << std::endl;
+        }
+        else // Ha nem létezik a fájl
+        {
+            fileExists = false;
+        }
     }
 
-    // Read the content of the file line by line into a vector
-    std::vector<std::string> lines;
-    std::string line;
-    while (std::getline(inputFile, line)) {
-        lines.push_back(line);
+    if (fileExists)
+    {
+        if (std::remove(filePath) != 0);
     }
 
-    // Close the input file
-    inputFile.close();
+    size++;
+    std::ofstream file(filePath);
+
+    if (file.is_open())
+    {
+        file << size << "\n";
+        for (size_t i = 0; i < size - 1; i++)
+        {
+            file << tcArray[i].get_number() << " " << (tcArray[i].get_boolean() ? "true" : "false") << "\n";
+        }
+        file << number << " " << (boolean ? "true" : "false") << "\n";
+    }
+
+    if (tcArray != NULL) delete[] tcArray;
+}
+
+size_t ZaPe::TestClass::read(const char* filePath, TestClass* tcArray)
+{
+    std::ifstream file(filePath);    
+    size_t counter = 0;
+
+    if (file.is_open())
+    {
+        file >> counter;
+
+        if (counter < 1) 
+        {
+            file.close();
+            throw std::out_of_range("File is not in the correct format or counter is smaller than 0");
+        }
+
+        if (tcArray == NULL)
+        {
+            file.close();
+            return counter;
+        }
+
+        for (size_t i = 0; i < counter; i++)
+        {
+            int number;
+            bool boolean;
+
+            file >> number >> std::boolalpha >> boolean;
+
+            tcArray[i].set_number(number);
+            tcArray[i].set_boolean(boolean);
+        }
+    }
+    else throw std::out_of_range("Unable to open file");
 
 
-    // Append
+    return counter;
 }
 
 

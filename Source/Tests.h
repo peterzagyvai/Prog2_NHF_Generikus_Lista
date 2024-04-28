@@ -45,7 +45,7 @@ namespace ZaPe
         inline void set_boolean(bool boolean) { this->boolean = boolean; }
 
         void write(const char* filePath) const;
-        static size_t read(const char* filePath, TestClass* tcArray);
+        static size_t read(const char* filePath, TestClass* tcArray = NULL);
 
     private:
         int number;
