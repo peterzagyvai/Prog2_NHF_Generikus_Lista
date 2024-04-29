@@ -146,16 +146,17 @@
     <ClInclude Include="Source\gtest_lite.h" />
     <ClInclude Include="Source\List.hpp" />
     <ClInclude Include="Source\memtrace.h" />
+    <ClInclude Include="Source\TestClass.h" />
     <ClInclude Include="Source\Tests.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\memtrace.cpp" />
-    <ClCompile Include="Source\Test.cpp" />
+    <ClCompile Include="Source\TestClass.cpp" />
+    <ClCompile Include="Source\Tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Bin\Input_Output\test.txt" />
-    <Text Include="Bin\Test.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -27,6 +27,9 @@
     <ClInclude Include="Source\Tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\TestClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.cpp">
@@ -35,12 +38,14 @@
     <ClCompile Include="Source\memtrace.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Test.cpp">
+    <ClCompile Include="Source\Tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\TestClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Bin\Input_Output\test.txt" />
-    <Text Include="Bin\Test.txt" />
   </ItemGroup>
 </Project>
