@@ -64,10 +64,16 @@ namespace ZaPe
             std::cout << "Kilepeshez a \"q\" karaktert kell begepelni" << std::endl;
 		}
 
-		void MainMenu()
+		void MainMenu(int argc, char** argv)
 		{
             std::string input;
             Menus::MainMenuInputType inputValue;
+
+
+            bool vanArg = false;
+            bool lefutott = false;
+
+            if (argc > 1) vanArg = true;
 
             do {
                 inputValue = Menus::MainMenuInputType::UNDEFINED;
@@ -76,7 +82,15 @@ namespace ZaPe
                 Menus::PrintMainMenuMessage();
 
                 // Get input
-				std::getline(std::cin, input);
+                if (!vanArg)
+                    std::getline(std::cin, input);
+                else
+                {
+                    if (!lefutott)
+                        input = "2";
+                    else
+                        input = "0";
+                }
 
                 int inputInt = Menus::TestInput(input, 5);
                 if (inputInt == -1)
@@ -132,6 +146,8 @@ namespace ZaPe
 
                     Menus::ClearConsole();
                 }
+
+                lefutott = true;
 
             } while (inputValue != Menus::MainMenuInputType::KILEP);
 		}

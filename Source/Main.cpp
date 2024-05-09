@@ -2,7 +2,7 @@
 
 #include "memtrace.h"
 
-int main()
+int main(int argc, char** argv)
 {
 #ifdef HOST_WINDOWS
 #ifdef HOST_LINUX
@@ -12,7 +12,7 @@ int main()
 #endif // HOST_LINUX
 #endif // HOST_WINDOWS
 
-    ZaPe::Menus::MainMenu();
+    ZaPe::Menus::MainMenu(argc, argv);
 
     return 0;
 }

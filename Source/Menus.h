@@ -27,7 +27,7 @@ namespace ZaPe {
 		void PrintMainMenuMessage();
         void PrintNormalModMenu();
 
-        void MainMenu();
+        void MainMenu(int argc, char** argv);
 
         int TestInput(const std::string& input, int maxValue);
 	}
