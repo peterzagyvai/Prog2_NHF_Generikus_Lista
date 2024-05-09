@@ -3,6 +3,9 @@
 #include <iostream>
 #include <fstream>
 
+#include "memtrace.h"
+
+
 void ZaPe::TestClass::write(const char* filePath) const
 {
     size_t size = 0;

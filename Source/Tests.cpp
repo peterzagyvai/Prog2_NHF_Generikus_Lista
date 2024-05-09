@@ -9,7 +9,6 @@
 #include "gtest_lite.h"
 #include "memtrace.h"
 
-
 namespace ZaPe
 {
     void InitGtest()
@@ -21,7 +20,7 @@ namespace ZaPe
     {
         TestInt();
         TestCString();
-        TestClass();
+        TestOnClass();
     }
 
 
@@ -179,6 +178,20 @@ namespace ZaPe
             EXPECT_STREQ(c2, strings[2]);
 
         }END
+
+        TEST(Lista, char_string_duplikacio) {
+            List<const char*> strings;
+            
+            EXPECT_NO_THROW(strings.push_back("Hello World"));
+            EXPECT_NO_THROW(strings.push_back("Hello World"));
+            EXPECT_NO_THROW(strings.push_back("Valami teljesen mas"));
+
+            EXPECT_NO_THROW(strings.delete_duplicates());
+
+            EXPECT_EQ(2, strings.get_length());
+            EXPECT_STREQ("Hello World", strings[0]);
+            EXPECT_STREQ("Valami teljesen mas", strings[1]);
+        }END
     }
 
     void TestOnClass()
@@ -235,7 +248,7 @@ namespace ZaPe
             EXPECT_THROW(tcIter++, std::out_of_range);
         }END
 
-            TEST(Lista, OnClass_Renez_No_Operators) {
+            TEST(Lista, OnClass_Rendez_No_Operators) {
             List<TestClass> tcs2;
             tcs2.push_back(TestClass(3));
             tcs2.push_back(TestClass(1));
@@ -248,10 +261,52 @@ namespace ZaPe
             EXPECT_EQ(1, tcs2[2].get_number());
         } END
 
-            TEST(Lista, Clear) {
+
+            TEST(Lista, OnClass_Clear) {
             EXPECT_NO_THROW(tcs.clear());
             EXPECT_THROW(tcs[0], std::out_of_range);
             EXPECT_EQ(0, tcs.get_length());
+        }END
+
+            TEST(Lista, OnClass_Iras_Olvasas){
+            List<TestClass> tc_list;
+            tc_list.push_back(TestClass(1, true));
+            tc_list.push_back(TestClass(2, false));
+            tc_list.push_back(TestClass(3, false));
+            tc_list.push_back(TestClass(4, true));
+
+            for (List<TestClass>::Iterator iter = tc_list.begin(); iter != tc_list.end(); iter++)
+            {
+                EXPECT_NO_THROW(iter->write("datas.txt"));
+            }
+
+            size_t size = 0;
+            EXPECT_NO_THROW(size = TestClass::read("datas.txt"));
+
+            TestClass* datas = new TestClass[size];
+            EXPECT_NO_THROW(TestClass::read("datas.txt", datas));
+            remove("datas.txt");
+
+
+            List<TestClass> tc_list_read(datas, size);
+            delete[] datas;
+
+            EXPECT_EQ(4, tc_list_read.get_length());
+
+            EXPECT_EQ(1, tc_list_read[0].get_number());
+            EXPECT_EQ(true, tc_list_read[0].get_boolean());
+
+            EXPECT_EQ(2, tc_list_read[1].get_number());
+            EXPECT_EQ(false, tc_list_read[1].get_boolean());
+
+            EXPECT_EQ(3, tc_list_read[2].get_number());
+            EXPECT_EQ(false, tc_list_read[2].get_boolean());
+
+            EXPECT_EQ(4, tc_list_read[3].get_number());
+            EXPECT_EQ(true, tc_list_read[3].get_boolean());
+
+
+
         }END
     }
 }

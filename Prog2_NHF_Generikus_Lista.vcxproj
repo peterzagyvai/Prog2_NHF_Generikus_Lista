@@ -146,12 +146,16 @@
     <ClInclude Include="Source\gtest_lite.h" />
     <ClInclude Include="Source\List.hpp" />
     <ClInclude Include="Source\memtrace.h" />
+    <ClInclude Include="Source\Menus.h" />
+    <ClInclude Include="Source\NormalMode.h" />
     <ClInclude Include="Source\TestClass.h" />
     <ClInclude Include="Source\Tests.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\memtrace.cpp" />
+    <ClCompile Include="Source\Menus.cpp" />
+    <ClCompile Include="Source\NormalMode.cpp" />
     <ClCompile Include="Source\TestClass.cpp" />
     <ClCompile Include="Source\Tests.cpp" />
   </ItemGroup>

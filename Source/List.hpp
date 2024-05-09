@@ -78,7 +78,7 @@ namespace ZaPe
 
             /// @brief Beállítja az iterátor listaelemét a paraméterként kapott lista első elemének értékére
             /// @param l 
-            Iterator(const List& l);
+            Iterator(const List<T>& l);
             
             /// @brief Pre-increment: Beállítja az iterátor listaelemét a soron következő listaelemre, majd visszatér magával
             /// @return Az increment utáni önmagával tér vissza
@@ -194,7 +194,33 @@ namespace ZaPe
         static void swap(T& t1, T& t2);
     };
 
-    //Definitions:
+    /// Definitions:
+
+    /// CTORS, DTOR =======================================================================
+    template<typename T>
+    List<T>::List(const List<T>& l)
+    {
+        first = last = NULL;
+        length = 0;
+
+        for (List<T>::Iterator iter = l.begin(); iter != l.end(); iter++)
+        {
+            push_back(*iter);
+        }
+    }
+
+    template<typename T>
+    List<T>::List(T* dataArray, size_t sizeOfArray)
+    {
+        first = last = NULL;
+        length = 0;
+
+        for (size_t i = 0; i < sizeOfArray; i++)
+        {
+            push_back(dataArray[i]);
+        }
+    }
+
 
     template<typename T>
     List<T>::~List() { clear(); }
